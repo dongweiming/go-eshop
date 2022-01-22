@@ -1,16 +1,13 @@
 package api
 
 import (
+	"fmt"
 	"log"
 
 	"github.com/dongweiming/go-eshop/eshop"
 
 	"github.com/algolia/algoliasearch-client-go/v3/algolia/opt"
 	"github.com/algolia/algoliasearch-client-go/v3/algolia/search"
-)
-
-const (
-	PerPage = 200
 )
 
 type AlgoliaItem struct {
@@ -28,11 +25,14 @@ type AlgoliaItem struct {
 	// lowestPrice/msrp 价格
 }
 
-func Search(country int, filter string, page, per_page int) ([]AlgoliaItem, bool) {
+func Search(country int, filter string, page, per_page, order int) ([]AlgoliaItem, bool) {
 	index, ok := eshop.AlgoliaIndexMap[country]
 	if !ok {
 		print("Please use the known country constant such as `eshop.US` for country param!")
 		return nil, false
+	}
+	if order != eshop.ORDER_FEATURE {
+		index += "_" + eshop.OrderByMap[order]
 	}
 	client := search.NewClient(eshop.AlgoliaID, eshop.AlgoliaKey)
 
@@ -66,23 +66,22 @@ func Search(country int, filter string, page, per_page int) ([]AlgoliaItem, bool
 	return games, res.NbPages <= page
 }
 
-func GetAlgoliaItems(country int, filter string) []AlgoliaItem {
+func GetAlgoliaItems(country int, filter string, order int) []AlgoliaItem {
 	var page, stop = 0, false
 	var games_, games []AlgoliaItem
-	games_, _ = Search(country, filter, page, eshop.PerPage)
-	return games_
 
 	for !stop {
-		games_, stop = Search(country, filter, page, eshop.PerPage)
+		games_, stop = Search(country, filter, page, eshop.PerPage, order)
 		games = append(games, games_...)
+		page++
 	}
 	return games
 }
 
-func GetAllDealItems(country int) []AlgoliaItem {
-	return GetAlgoliaItems(country, "generalFilters:Deals")
+func GetAllDealItems(country int, order int) []AlgoliaItem {
+	return GetAlgoliaItems(country, "generalFilters:Deals", order)
 }
 
-func GetAllItems(country int) []AlgoliaItem {
-	return GetAlgoliaItems(country, "")
+func GetAllItems(country int, order int) []AlgoliaItem {
+	return GetAlgoliaItems(country, "", order)
 }

@@ -23,7 +23,12 @@ func GetAllGames(country interface{}) []AlgoliaItem {
 	}
 	// US/BR/MX/CA
 	if _, ok = eshop.AlgoliaIndexMap[c]; ok {
-		return GetAlgoliaItems(c, "")
+		var items []AlgoliaItem
+		for order, _ := range eshop.OrderByMap {
+			items_ := GetAlgoliaItems(c, "", order)
+			items = append(items, items_...)
+		}
+		return items
 	}
 	return nil
 }

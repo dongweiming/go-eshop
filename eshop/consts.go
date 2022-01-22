@@ -31,6 +31,15 @@ const (
 	Europe
 )
 
+const (
+	ORDER_FEATURE = iota
+	ORDER_RELEASE_DES
+	ORDER_TITLE_ASC
+	ORDER_TITLE_DESC
+	ORDER_PRICE_ASC
+	ORDER_PRICE_DESC
+)
+
 var (
 	Region = map[int][]int {
 		Americas: []int{US, BR, CA, MX, PE, CO, AR, CL},
@@ -58,5 +67,13 @@ var (
 			"AR": AR,
 			"CL": CL,
 			"AU": AU,
+		}
+	OrderByMap = map[int]string {
+		ORDER_FEATURE: "",
+		ORDER_RELEASE_DES: "release_des",
+		ORDER_TITLE_ASC: "title_asc",
+		ORDER_TITLE_DESC: "title_des",
+		ORDER_PRICE_ASC: "price_asc",
+		ORDER_PRICE_DESC: "price_des",
 	}
 )
